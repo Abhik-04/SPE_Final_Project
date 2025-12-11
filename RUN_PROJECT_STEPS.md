@@ -78,7 +78,7 @@ minikube start --cpus=4 --memory=8192 --driver=docker
 # Enable metrics server (required for HPA)
 minikube addons enable metrics-server
 
-# Verify cluster is running
+# Verify if the cluster is running
 kubectl cluster-info
 kubectl get nodes
 ```
