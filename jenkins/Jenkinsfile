@@ -6,6 +6,9 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-id')
         DOCKERHUB_USERNAME = 'abhikkumar04'
         
+        // Docker path for macOS
+        PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${env.PATH}"
+        
         // Docker image details
         IMAGE_NAME = "${DOCKERHUB_USERNAME}/spam-classifier"
         IMAGE_TAG = "${BUILD_NUMBER}"
