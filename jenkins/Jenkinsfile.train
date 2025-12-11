@@ -15,10 +15,8 @@ pipeline {
     }
     
     environment {
-        MLFLOW_TRACKING_URI = sh(
-            script: "kubectl get svc mlflow-service -n spam-classifier -o jsonpath='{.spec.clusterIP}':5000",
-            returnStdout: true
-        ).trim()
+        // MLflow URI will be set dynamically in the training stage
+        MLFLOW_TRACKING_URI = ''
     }
     
     stages {
@@ -44,6 +42,13 @@ pipeline {
         stage('Train Model') {
             steps {
                 echo "Training model with algorithm: ${params.ALGORITHM}"
+                script {
+                    // Get MLflow service URI dynamically
+                    env.MLFLOW_TRACKING_URI = sh(
+                        script: "kubectl get svc mlflow-service -n spam-classifier -o jsonpath='{.spec.clusterIP}':5000 || echo 'localhost:5000'",
+                        returnStdout: true
+                    ).trim()
+                }
                 sh """
                     . venv/bin/activate
                     export MLFLOW_TRACKING_URI=http://${MLFLOW_TRACKING_URI}
