@@ -44,17 +44,24 @@ pipeline {
                 echo "Training model with algorithm: ${params.ALGORITHM}"
                 script {
                     // Get MLflow service URI dynamically
-                    env.MLFLOW_TRACKING_URI = sh(
-                        script: "kubectl get svc mlflow-service -n spam-classifier -o jsonpath='{.spec.clusterIP}':5000 || echo 'localhost:5000'",
+                    def mlflowUri = sh(
+                        script: "kubectl get svc mlflow-service -n spam-classifier -o jsonpath='{.spec.clusterIP}' 2>/dev/null || echo ''",
                         returnStdout: true
                     ).trim()
                     
-                    echo "MLflow Tracking URI: http://${env.MLFLOW_TRACKING_URI}"
+                    if (mlflowUri) {
+                        env.MLFLOW_TRACKING_URI = "http://${mlflowUri}:5000"
+                    } else {
+                        env.MLFLOW_TRACKING_URI = "http://localhost:5000"
+                    }
                     
-                    // Run training
+                    echo "MLflow Tracking URI: ${env.MLFLOW_TRACKING_URI}"
+                    
+                    // Run training with PYTHONPATH set to find src module
                     sh """
                         . venv/bin/activate
-                        export MLFLOW_TRACKING_URI=http://${env.MLFLOW_TRACKING_URI}
+                        export MLFLOW_TRACKING_URI=${env.MLFLOW_TRACKING_URI}
+                        export PYTHONPATH=\${PYTHONPATH}:\${PWD}
                         python src/train.py \
                             --algorithm ${params.ALGORITHM} \
                             --max-features ${params.MAX_FEATURES}
