@@ -4,7 +4,7 @@ pipeline {
     parameters {
         booleanParam(
             name: 'TRIGGER_TRAINING',
-            defaultValue: false,
+            defaultValue: true,
             description: 'Trigger model training after deployment'
         )
     }
