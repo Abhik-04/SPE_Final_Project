@@ -35,3 +35,13 @@ Traceback (most recent call last):
 SystemExit: 1
 [2025-12-11 23:06:47 +0530] [65818] [INFO] Worker exiting (pid: 65818)
 [2025-12-11 23:06:48 +0530] [67525] [INFO] Booting worker with pid: 67525
+[2025-12-12 00:34:59 +0530] [65814] [INFO] Handling signal: hup
+[2025-12-12 00:34:59 +0530] [65814] [INFO] Hang up: Master
+[2025-12-12 00:34:59 +0530] [65814] [ERROR] Worker (pid:67525) was sent SIGHUP!
+[2025-12-12 00:34:59 +0530] [65814] [ERROR] Worker (pid:65816) was sent SIGHUP!
+[2025-12-12 00:34:59 +0530] [65814] [ERROR] Worker (pid:65815) was sent SIGHUP!
+[2025-12-12 00:34:59 +0530] [65814] [ERROR] Worker (pid:65817) was sent SIGHUP!
+[2025-12-12 00:34:59 +0530] [97366] [INFO] Booting worker with pid: 97366
+[2025-12-12 00:34:59 +0530] [97364] [INFO] Booting worker with pid: 97364
+[2025-12-12 00:34:59 +0530] [97362] [INFO] Booting worker with pid: 97362
+[2025-12-12 00:34:59 +0530] [97363] [INFO] Booting worker with pid: 97363

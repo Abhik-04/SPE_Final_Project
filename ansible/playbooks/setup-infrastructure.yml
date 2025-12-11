@@ -15,14 +15,13 @@
         msg: "Setting up infrastructure for {{ app_name }}"
 
   roles:
-    - role: kubernetes-setup
+    - role: ../roles/kubernetes-setup
       tags: ['kubernetes', 'setup']
     
-    - role: vault-config
+    - role: ../roles/vault-config
       tags: ['vault', 'security']
+      when: vault_enabled | default(false)
     
-    - role: elk-stack
+    - role: ../roles/elk-stack
       tags: ['elk', 'monitoring']
-    
-    - role: app-deployment
-      tags: ['app', 'deployment']
+      when: elk_enabled | default(true)

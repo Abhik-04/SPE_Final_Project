@@ -354,18 +354,19 @@ Go to: Manage Jenkins → Manage Credentials → Global → Add Credentials
 
 ## PART 7: APPLICATION DEPLOYMENT
 
-### Step 7.1: Deploy Using Ansible
+### Step 7.1: Deploy Using Ansible (Optional)
 ```bash
-cd ansible
+# Run from project root
+cd /Users/abhik04/Documents/VSCode/SPE/Final_Project
 
-# Deploy infrastructure
-ansible-playbook -i inventory/hosts.ini playbooks/setup-infrastructure.yml
+# Deploy infrastructure (sets up namespace, MLflow, ELK)
+ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/setup-infrastructure.yml
 
 # Deploy application
-ansible-playbook -i inventory/hosts.ini playbooks/deploy-app.yml
-
-cd ..
+ansible-playbook -i ansible/inventory/hosts.ini ansible/playbooks/deploy-app.yml
 ```
+
+**Note:** Ansible is optional. If you encounter issues, use Step 7.2 (Manual deployment) instead.
 
 ### Step 7.2: Manually Apply Kubernetes Manifests (Alternative)
 ```bash
@@ -396,10 +397,10 @@ kubectl get hpa -n spam-classifier
 # Get service details
 kubectl get svc spam-classifier-service -n spam-classifier
 
-# If LoadBalancer is pending, use port-forward
-kubectl port-forward -n spam-classifier svc/spam-classifier-service 8080:80 &
+# If LoadBalancer is pending, use port-forward (using 8888 to avoid Jenkins on 8080)
+kubectl port-forward -n spam-classifier svc/spam-classifier-service 8888:80 &
 
-# Open in browser: http://localhost:8080
+# Open in browser: http://localhost:8888
 ```
 
 ---
@@ -429,14 +430,14 @@ kubectl get hpa -n spam-classifier
 ### Step 8.2: Test End-to-End Flow
 ```bash
 # Make a prediction
-curl -X POST http://localhost:8080 \
+curl -X POST http://localhost:8888 \
   -H "Content-Type: application/json" \
   -d '{"text": "Congratulations! You won $1000. Click here to claim now!"}'
 
 # Check logs in Kibana
 # 1. Go to http://localhost:5601
-# 2. Management → Stack Management → Index Patterns
-# 3. Create index pattern: spam-classifier-logs-*
+# 2. Management → Stack Management → Kibana → Data Views (or Index Patterns in older versions)
+# 3. Create data view: spam-classifier-logs-*
 # 4. Go to Discover and view logs
 ```
 
@@ -506,7 +507,7 @@ kubectl get hpa -n spam-classifier
 
 # Load test to trigger scaling
 for i in {1..100}; do
-  curl -s http://localhost:8080/_stcore/health &
+  curl -s http://localhost:8888/_stcore/health &
 done
 
 # Watch HPA scale up
@@ -515,7 +516,7 @@ kubectl get hpa -n spam-classifier -w
 
 #### **Step 6: Show Application (2 min)**
 ```bash
-# Open application: http://localhost:8080
+# Open application: http://localhost:8888
 
 # Test spam prediction:
 # Input: "URGENT! You won $1000. Click here NOW!"
@@ -546,7 +547,7 @@ git push origin main
 kubectl get pods -n spam-classifier -w
 
 # Show application remains accessible during update
-while true; do curl -s http://localhost:8080/_stcore/health && echo " - $(date)"; sleep 2; done
+while true; do curl -s http://localhost:8888/_stcore/health && echo " - $(date)"; sleep 2; done
 ```
 
 #### **Step 9: Show Vault (Optional - 1 min)**
@@ -648,7 +649,7 @@ curl http://localhost:9200/_cat/indices
 
 | Service                         | Port | Access URL            | Purpose            |
 | ------------------------------- | ---- | --------------------- | ------------------ |
-| **Spam Classifier (Streamlit)** | 8501 | http://localhost:8080 | Main application   |
+| **Spam Classifier (Streamlit)** | 8501 | http://localhost:8888 | Main application   |
 | **MLflow**                      | 5000 | http://localhost:5000 | MLflow tracking UI |
 | **Jenkins**                     | 8080 | http://localhost:8080 | CI/CD server       |
 | **Kibana**                      | 5601 | http://localhost:5601 | Log visualization  |
@@ -681,7 +682,7 @@ kubectl scale deployment spam-classifier --replicas=5 -n spam-classifier
 kubectl delete namespace spam-classifier
 
 # Port forward services
-kubectl port-forward -n spam-classifier svc/spam-classifier-service 8080:80
+kubectl port-forward -n spam-classifier svc/spam-classifier-service 8888:80
 kubectl port-forward -n spam-classifier svc/mlflow-service 5000:5000
 kubectl port-forward -n spam-classifier svc/kibana 5601:5601
 ```

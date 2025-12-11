@@ -24,7 +24,7 @@
 
     - name: Deploy application using role
       include_role:
-        name: app-deployment
+        name: ../roles/app-deployment
       tags: ['deploy']
 
     - name: Wait for deployment to be ready

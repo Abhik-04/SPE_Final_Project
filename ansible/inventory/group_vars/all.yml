@@ -2,7 +2,7 @@
 # Global variables for all playbooks
 
 # Docker configuration
-docker_image: "spam-classifier:latest"
+docker_image: "abhikkumar04/spam-classifier:latest"
 docker_registry: "docker.io"
 
 # Kubernetes configuration
