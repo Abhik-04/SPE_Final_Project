@@ -45,7 +45,7 @@ def train_model(algorithm='naive_bayes', max_features=3000, ngram_range=(1, 2)):
     mlflow_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
     mlflow.set_tracking_uri(mlflow_uri)
     
-    # Create or get experiment with proper artifact location
+    # Create or get experiment with proper the artifact location
     experiment_name = "spam-classifier-training"
     try:
         experiment = mlflow.get_experiment_by_name(experiment_name)
