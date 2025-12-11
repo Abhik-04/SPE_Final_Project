@@ -1,6 +1,14 @@
 pipeline {
     agent any
     
+    parameters {
+        booleanParam(
+            name: 'TRIGGER_TRAINING',
+            defaultValue: false,
+            description: 'Trigger model training after deployment'
+        )
+    }
+    
     environment {
         // Docker Hub credentials (stored in Jenkins or Vault)
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-id')
@@ -193,6 +201,23 @@ pipeline {
                         curl -f http://$SERVICE_IP/_stcore/health || exit 1
                     fi
                 '''
+            }
+        }
+        
+        stage('Trigger Model Training') {
+            when {
+                expression { 
+                    return params.TRIGGER_TRAINING ?: false
+                }
+            }
+            steps {
+                echo 'Triggering model training pipeline...'
+                build job: 'spam-classifier-train', 
+                      parameters: [
+                          string(name: 'ALGORITHM', value: 'naive_bayes'),
+                          string(name: 'MAX_FEATURES', value: '3000')
+                      ],
+                      wait: false
             }
         }
     }
