@@ -48,14 +48,18 @@ pipeline {
                         script: "kubectl get svc mlflow-service -n spam-classifier -o jsonpath='{.spec.clusterIP}':5000 || echo 'localhost:5000'",
                         returnStdout: true
                     ).trim()
+                    
+                    echo "MLflow Tracking URI: http://${env.MLFLOW_TRACKING_URI}"
+                    
+                    // Run training
+                    sh """
+                        . venv/bin/activate
+                        export MLFLOW_TRACKING_URI=http://${env.MLFLOW_TRACKING_URI}
+                        python src/train.py \
+                            --algorithm ${params.ALGORITHM} \
+                            --max-features ${params.MAX_FEATURES}
+                    """
                 }
-                sh """
-                    . venv/bin/activate
-                    export MLFLOW_TRACKING_URI=http://${MLFLOW_TRACKING_URI}
-                    python src/train.py \
-                        --algorithm ${params.ALGORITHM} \
-                        --max-features ${params.MAX_FEATURES}
-                """
             }
         }
         
@@ -74,10 +78,12 @@ pipeline {
             steps {
                 echo 'Model artifacts saved to models/ directory'
                 echo 'Check MLflow UI for experiment tracking and model registry'
-                sh '''
-                    echo "MLflow UI: http://${MLFLOW_TRACKING_URI}"
-                    ls -lh models/
-                '''
+                script {
+                    sh """
+                        echo "MLflow UI: http://${env.MLFLOW_TRACKING_URI}"
+                        ls -lh models/
+                    """
+                }
             }
         }
         
