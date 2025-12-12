@@ -78,7 +78,7 @@ minikube start --cpus=4 --memory=8192 --driver=docker
 # Enable metrics server (required for HPA)
 minikube addons enable metrics-server
 
-# Verify if the cluster is running
+# Verify cluster is running
 kubectl cluster-info
 kubectl get nodes
 ```
@@ -127,24 +127,7 @@ docker images | grep spam-classifier
 docker images | grep mlflow-server
 ```
 
-### Step 2.2: Test Docker Image Locally
-```bash
-# Run container
-docker run -d -p 8501:8501 --name spam-test ${DOCKERHUB_USERNAME}/spam-classifier:latest
-
-# Check logs
-docker logs spam-test
-
-# Test health endpoint
-sleep 20
-curl http://localhost:8501/_stcore/health
-
-# Stop and remove
-docker stop spam-test
-docker rm spam-test
-```
-
-### Step 2.3: Push to Docker Hub
+### Step 2.2: Push to Docker Hub
 ```bash
 # Login to Docker Hub
 echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
@@ -155,6 +138,23 @@ docker push ${DOCKERHUB_USERNAME}/mlflow-server:latest
 
 # Verify on Docker Hub
 echo "Verify at: https://hub.docker.com/r/${DOCKERHUB_USERNAME}/spam-classifier"
+```
+
+### Step 2.3: Test Docker Image Locally
+```bash
+# Run container
+docker run -d -p 8888:8888 --name spam-test ${DOCKERHUB_USERNAME}/spam-classifier:latest
+
+# Check logs
+docker logs spam-test
+
+# Test health endpoint
+sleep 20
+curl http://localhost:8888/_stcore/health
+
+# Stop and remove
+docker stop spam-test
+docker rm spam-test
 ```
 
 ---
