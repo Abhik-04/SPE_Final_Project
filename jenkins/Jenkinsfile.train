@@ -95,18 +95,6 @@ pipeline {
                 }
             }
         }
-        
-        stage('Trigger Deployment') {
-            when {
-                expression {
-                    return params.AUTO_DEPLOY == true
-                }
-            }
-            steps {
-                echo 'Triggering main deployment pipeline...'
-                build job: 'spam-classifier-deploy', wait: false
-            }
-        }
     }
     
     post {
